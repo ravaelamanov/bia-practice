@@ -1,0 +1,91 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      mirror /mirror;
+      mirror_request_body off;
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location = /mirror {
+          set $target_service "target-service";
+          set $auth_type "jwt";
+      
+          proxy_set_header x-request-uri $request_uri;
+          proxy_set_header x-target-service $target_service;
+          
+          internal;
+          log_subrequest on;
+          proxy_pass http://mirror/$auth_type;
+          proxy_connect_timeout 200ms;
+          proxy_read_timeout 200ms;
+      }
+    nginx.ingress.kubernetes.io/stream-snippet: |
+      upstream mirror {
+          server monitoring-producer-service.default:80;
+      }
+  name: mirroring-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: target-service
+                port:
+                  number: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: target-service
+  labels:
+    app: target-service
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: target
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: target
+  labels:
+    app: target
+spec:
+  selector:
+    matchLabels:
+      app: target
+  template:
+    metadata:
+      labels:
+        app: target
+    spec:
+      containers:
+        - name: target
+          image: target-service:0.0.1-SNAPSHOT
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+#          livenessProbe:
+#            httpGet:
+#              port: 8080
+#              path: /q/health/live
+#            initialDelaySeconds: 30
+#            terminationGracePeriodSeconds: 10
+#            timeoutSeconds: 2
+#            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /
+            initialDelaySeconds: 30
+            timeoutSeconds: 2
+            periodSeconds: 10
