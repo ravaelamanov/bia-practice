@@ -21,7 +21,7 @@ metadata:
       }
     nginx.ingress.kubernetes.io/stream-snippet: |
       upstream mirror {
-          server monitoring-producer-service.default:80;
+          server monitoring-producer-service:8080;
       }
   name: mirroring-ingress
 spec:
@@ -74,18 +74,3 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
-#          livenessProbe:
-#            httpGet:
-#              port: 8080
-#              path: /q/health/live
-#            initialDelaySeconds: 30
-#            terminationGracePeriodSeconds: 10
-#            timeoutSeconds: 2
-#            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              port: 8080
-              path: /
-            initialDelaySeconds: 30
-            timeoutSeconds: 2
-            periodSeconds: 10
