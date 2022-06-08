@@ -1,0 +1,16 @@
+server:
+  port: 8081
+
+spring:
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:admin}
+    virtual-host: /
+  cloud:
+    stream:
+      bindings:
+        monitoringRequests:
+          destination: monitoring.requests
+          binder: rabbit
