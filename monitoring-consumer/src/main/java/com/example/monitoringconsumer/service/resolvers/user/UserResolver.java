@@ -1,11 +1,10 @@
-package com.example.monitoringproducer.services.resolvers;
+package com.example.monitoringconsumer.service.resolvers.user;
 
-import com.example.monitoringproducer.domain.Request;
-import com.example.monitoringproducer.services.resolvers.util.AuthType;
+import com.example.monitoringconsumer.domain.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public interface UserResolver {
-    String resolve(Request request);
+    void resolve(Request request);
 
     AuthType authType();
 

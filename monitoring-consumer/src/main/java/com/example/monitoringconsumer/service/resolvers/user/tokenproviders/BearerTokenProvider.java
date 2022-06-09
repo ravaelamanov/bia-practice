@@ -1,17 +1,15 @@
-package com.example.monitoringproducer.services.resolvers.tokenproviders;
+package com.example.monitoringconsumer.service.resolvers.user.tokenproviders;
 
-import com.example.monitoringproducer.domain.Request;
+import com.example.monitoringconsumer.domain.Request;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
 @Component
-public class JwtTokenProvider implements TokenProvider{
-    private final static String AUTHORIZATION = "authorization";
-
+public class BearerTokenProvider implements TokenProvider{
     @Override
     public String provide(Request request) {
-        String authorizationHeader = request.getHeader(AUTHORIZATION);
+        String authorizationHeader = TokenProviderUtil.getAuthorizationHeader(request);
         Objects.requireNonNull(authorizationHeader);
 
         String[] parts = authorizationHeader.split(" ");

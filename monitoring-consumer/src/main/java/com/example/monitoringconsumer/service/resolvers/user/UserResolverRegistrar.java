@@ -1,6 +1,5 @@
-package com.example.monitoringproducer.services.resolvers;
+package com.example.monitoringconsumer.service.resolvers.user;
 
-import com.example.monitoringproducer.services.resolvers.util.AuthType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
