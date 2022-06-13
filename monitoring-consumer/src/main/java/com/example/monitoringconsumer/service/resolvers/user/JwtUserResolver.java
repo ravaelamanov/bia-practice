@@ -33,7 +33,6 @@ public class JwtUserResolver implements UserResolver {
             userId = claims.getBody().get(USER_ID_CLAIM, String.class);
         }
         catch (ExpiredJwtException exception) {
-            //TODO: do we really want to process expired tokens?
             userId = exception.getClaims().get(USER_ID_CLAIM, String.class);
         }
 

@@ -4,8 +4,6 @@ import com.example.monitoringconsumer.domain.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-
 @Component
 public class SynapseTokenProvider implements TokenProvider {
     private final BearerTokenProvider bearerTokenProvider;
@@ -22,8 +20,8 @@ public class SynapseTokenProvider implements TokenProvider {
         try {
             token = bearerTokenProvider.provide(request);
         } catch (Exception exception) {
-            token = request.getQuery().get(QUERY_PARAM);
-            Objects.requireNonNull(token);
+            token = request.getQuery(QUERY_PARAM)
+                    .orElseThrow(() -> new IllegalArgumentException("No %s query parameter in request: %s".formatted(QUERY_PARAM, request.toString())));
             TokenProviderUtil.requireNonBlank(token, new IllegalArgumentException("Token in query parameters is blank!"));
         }
         return token;

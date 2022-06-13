@@ -5,13 +5,14 @@ import com.example.monitoringproducer.services.ProducerService;
 import com.example.monitoringproducer.util.AuthType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
+import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -28,8 +29,8 @@ public class ProducerController {
     @RequestMapping("/jwt/**")
     void publishJwt(HttpServletRequest httpServletRequest,
                     @RequestHeader("x-target-service") String targetName,
-                    @RequestHeader Map<String, String> headers, // switched to Map from MultiValueMap because consumer cannot deserialize it and fails with ClassCastException
-                    @RequestParam(required = false) Map<String, String> query) {
+                    @RequestHeader MultiValueMap<String, String> headers,
+                    @RequestParam(required = false) MultiValueMap<String, String> query) {
         Request request = makeRequest(targetName, headers, query, httpServletRequest, AuthType.JWT);
         log.info("Handling mirrored request: " + request.toString());
 
@@ -39,8 +40,8 @@ public class ProducerController {
     @RequestMapping("/synapse/**")
     void publishSynapse(HttpServletRequest httpServletRequest,
                         @RequestHeader("x-target-service") String targetName,
-                        @RequestHeader Map<String, String> headers,
-                        @RequestParam(required = false) Map<String, String> query) {
+                        @RequestHeader MultiValueMap<String, String> headers,
+                        @RequestParam(required = false) MultiValueMap<String, String> query) {
         Request request = makeRequest(targetName, headers, query, httpServletRequest, AuthType.SYNAPSE);
         log.info("Handling mirrored request: " + request.toString());
 
@@ -50,8 +51,8 @@ public class ProducerController {
     @RequestMapping("/**")
     void publishDefault(HttpServletRequest httpServletRequest,
                        @RequestHeader("x-target-service") String targetName,
-                       @RequestHeader Map<String, String> headers,
-                       @RequestParam(required = false) Map<String, String> query) {
+                       @RequestHeader MultiValueMap<String, String> headers,
+                       @RequestParam(required = false) MultiValueMap<String, String> query) {
         Request request = makeRequest(targetName, headers, query, httpServletRequest, AuthType.DEFAULT);
         log.info("Handling mirrored request: " + request.toString());
 
@@ -59,8 +60,8 @@ public class ProducerController {
     }
 
     private Request makeRequest(String targetName,
-                                Map<String, String> headers,
-                                Map<String, String> query,
+                                MultiValueMap<String, String> headers,
+                                MultiValueMap<String, String> query,
                                 HttpServletRequest httpServletRequest,
                                 AuthType authType) {
         return Request.builder()
@@ -70,6 +71,7 @@ public class ProducerController {
                 .uri(getTargetUri(httpServletRequest))
                 .clientIpAddress(httpServletRequest.getRemoteAddr())
                 .authType(authType)
+                .timestamp(Instant.now())
                 .build();
     }
 

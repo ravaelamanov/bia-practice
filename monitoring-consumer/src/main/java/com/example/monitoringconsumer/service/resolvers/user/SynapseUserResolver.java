@@ -24,13 +24,17 @@ public class SynapseUserResolver implements UserResolver {
     @Override
     public void resolve(Request request) {
         String token = provider.provide(request);
-        String userId = decodeBase64(token).lines()
+        String userId = getUserId(token);
+        request.setUserId(userId);
+    }
+
+    private String getUserId(String token) {
+        return decodeBase64(token).lines()
                 .filter(this::hasUserIdClaim)
                 .map(this::extractUserIdFromTokenLine)
                 .filter(id -> !id.isBlank())
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No user id claim in this token!"));
-        request.setUserId(userId);
     }
 
     private String decodeBase64(String str) {

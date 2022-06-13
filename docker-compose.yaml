@@ -10,7 +10,7 @@ services:
       - ./nginx/docker-entrypoint.sh:/docker-entrypoint.sh
     environment:
       SERVICE_NAME: "target-service"
-      AUTH_TYPE: "jwt"
+      AUTH_TYPE: "synapse"
       TARGET_SERVICE_HOST: target-service
       TARGET_SERVICE_PORT: 8080
       MIRROR_SERVICE_HOST: host.docker.internal
@@ -27,10 +27,15 @@ services:
       - RABBITMQ_DEFAULT_PASS=admin
   target-service:
     image: target-service:0.0.1-SNAPSHOT
-#  monitoring-producer:
-#    image: monitoring-producer:0.0.1-SNAPSHOT
-#    environment:
-#      RABBITMQ_HOST: rabbitmq
-#      RABBITMQ_PORT: 5672
-#      RABBITMQ_USERNAME: admin
-#      RABBITMQ_PASSWORD: admin
+  elastic: #TODO: configure elastic security
+    image: elasticsearch:7.17.1
+    environment:
+      discovery.type: single-node
+      ELASTIC_PASSWORD: elastic
+      LICENSE: basic
+    ports:
+      - "9200:9200"
+  grafana: #TODO: add template variables to dashboard
+    image: grafana/grafana
+    ports:
+      - "3000:3000"

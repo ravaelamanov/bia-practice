@@ -3,14 +3,12 @@ package com.example.monitoringconsumer.service.resolvers.user.tokenproviders;
 import com.example.monitoringconsumer.domain.Request;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-
 @Component
 public class BearerTokenProvider implements TokenProvider{
     @Override
     public String provide(Request request) {
-        String authorizationHeader = TokenProviderUtil.getAuthorizationHeader(request);
-        Objects.requireNonNull(authorizationHeader);
+        String authorizationHeader = TokenProviderUtil.getAuthorizationHeader(request)
+                .orElseThrow(() -> new IllegalArgumentException("No Authorization header in request: %s".formatted(request.toString())));
 
         String[] parts = authorizationHeader.split(" ");
 
