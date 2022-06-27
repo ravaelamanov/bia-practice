@@ -1,0 +1,91 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1655466870997-1
+      author: ravaelamanov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createSequence:
+            incrementBy: 1
+            sequenceName: hibernate_sequence
+            startValue: 1
+  - changeSet:
+      id: 1655466870997-2
+      author: ravaelamanov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_companies
+                  name: id
+                  type: UUID
+              - column:
+                  name: company_id
+                  type: VARCHAR(255)
+            tableName: companies
+  - changeSet:
+      id: 1655466870997-3
+      author: ravaelamanov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_users
+                  name: id
+                  type: UUID
+              - column:
+                  name: user_id
+                  type: VARCHAR(255)
+              - column:
+                  name: username
+                  type: VARCHAR(255)
+              - column:
+                  name: company_id
+                  type: UUID
+            tableName: users
+  - changeSet:
+      id: 1655466870997-4
+      author: ravaelamanov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: company_id
+            constraintName: uc_companies_company
+            tableName: companies
+  - changeSet:
+      id: 1655466870997-5
+      author: ravaelamanov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: user_id
+            constraintName: uc_users_user
+            tableName: users
+  - changeSet:
+      id: 1655466870997-6
+      author: ravaelamanov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: username
+            constraintName: uc_users_username
+            tableName: users
+  - changeSet:
+      id: 1655466870997-7
+      author: ravaelamanov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: company_id
+            baseTableName: users
+            constraintName: FK_USERS_ON_COMPANY
+            referencedColumnNames: id
+            referencedTableName: companies
+

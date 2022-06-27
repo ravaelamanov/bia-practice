@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-connectivity
+data:
+  rabbitmq-host: host.minikube.internal
+  rabbitmq-port: "5672"

@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitoring-consumer
+  labels:
+    app: monitoring-consumer
+spec:
+  selector:
+    matchLabels:
+      app: monitoring-consumer
+  template:
+    metadata:
+      labels:
+        app: monitoring-consumer
+    spec:
+      containers:
+        - name: monitoring-consumer
+          image: monitoring-consumer:0.0.1-SNAPSHOT
+          imagePullPolicy: Never
+          env:
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: rabbitmq-host
+                  name: rabbitmq-connectivity
+            - name: RABBITMQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: rabbitmq-port
+                  name: rabbitmq-connectivity
+            - name: RABBITMQ_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: rabbitmq-username
+                  name: rabbitmq-secrets
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: rabbitmq-password
+                  name: rabbitmq-secrets
+            - name: ELASTIC_INDEX_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: elasticsearch-index-name
+                  name: elasticsearch-connectivity
+            - name: ELASTIC_URIS
+              value: host.minikube.internal:9200
+            - name: ELASTIC_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: elasticsearch-username
+                  name: elasticsearch-secrets
+            - name: ELASTIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: elasticsearch-password
+                  name: elasticsearch-secrets
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: postgres-username
+                  name: postgres-secrets
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: postgres-password
+                  name: postgres-secrets
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: postgres-host
+                  name: postgres-connectivity
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: postgres-port
+                  name: postgres-connectivity
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: postgres-db
+                  name: postgres-connectivity

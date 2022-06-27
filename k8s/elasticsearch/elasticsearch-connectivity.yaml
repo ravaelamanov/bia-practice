@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elasticsearch-connectivity
+data:
+  elasticsearch-host: host.minikube.internal
+  elasticsearch-port: "9200"
+  elasticsearch-index-name: requests

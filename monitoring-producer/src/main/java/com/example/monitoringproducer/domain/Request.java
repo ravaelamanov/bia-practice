@@ -11,6 +11,7 @@ import java.time.Instant;
 @Builder
 public class Request {
     private String uri;
+    private String httpMethod;
     private String clientIpAddress;
     private MultiValueMap<String, String> headers;
     private MultiValueMap<String, String> query;

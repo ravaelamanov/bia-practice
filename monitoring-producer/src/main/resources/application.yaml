@@ -11,6 +11,6 @@ spring:
   cloud:
     stream:
       bindings:
-        monitoringRequests:
-          destination: monitoring.requests
+        requests:
+          destination: requests
           binder: rabbit

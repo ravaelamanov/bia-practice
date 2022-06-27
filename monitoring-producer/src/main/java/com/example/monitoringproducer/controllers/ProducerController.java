@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 @Slf4j
@@ -68,20 +67,27 @@ public class ProducerController {
                 .targetName(targetName)
                 .headers(headers)
                 .query(query)
-                .uri(getTargetUri(httpServletRequest))
+                .uri(getTargetUri(httpServletRequest.getRequestURI(), authType))
+                .httpMethod(httpServletRequest.getMethod())
                 .clientIpAddress(httpServletRequest.getRemoteAddr())
                 .authType(authType)
                 .timestamp(Instant.now())
                 .build();
     }
 
-    private String getTargetUri(HttpServletRequest request) {
-        String[] parts = request.getRequestURI().split("/", 3); // example split uri: ["", {auth_type}, {$request_uri}]
+    private String getTargetUri(String uri, AuthType authType) {
         String targetUri = "";
-        if (parts.length > 2) {
-            targetUri = parts[2];
+        if (authType.equals(AuthType.DEFAULT)) {
+            targetUri = uri;
         }
-        return "/" + targetUri;
+        else {
+            String[] parts = uri.split("/", 3); // example split uri: ["", {$auth_type}, {$request_uri}]
+            if (parts.length > 2) {
+                targetUri = "/" + parts[2];
+            }
+        }
+
+        return targetUri;
     }
 
     private void publishRequest(Request request) {
@@ -90,14 +96,5 @@ public class ProducerController {
         } catch (Exception exception) {
             log.error("Exception occurred", exception);
         }
-    }
-
-    private void delay(long seconds) {
-        try {
-            TimeUnit.SECONDS.sleep(seconds);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 }

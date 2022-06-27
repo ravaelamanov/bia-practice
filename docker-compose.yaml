@@ -10,7 +10,7 @@ services:
       - ./nginx/docker-entrypoint.sh:/docker-entrypoint.sh
     environment:
       SERVICE_NAME: "target-service"
-      AUTH_TYPE: "synapse"
+      AUTH_TYPE: "/synapse"
       TARGET_SERVICE_HOST: target-service
       TARGET_SERVICE_PORT: 8080
       MIRROR_SERVICE_HOST: host.docker.internal
@@ -27,15 +27,35 @@ services:
       - RABBITMQ_DEFAULT_PASS=admin
   target-service:
     image: target-service:0.0.1-SNAPSHOT
-  elastic: #TODO: configure elastic security
-    image: elasticsearch:7.17.1
+  elastic:
+    image: arm64v8/elasticsearch:7.8.0
     environment:
       discovery.type: single-node
+      xpack.security.enabled: "true"
       ELASTIC_PASSWORD: elastic
       LICENSE: basic
     ports:
       - "9200:9200"
-  grafana: #TODO: add template variables to dashboard
-    image: grafana/grafana
+  grafana:
+    image: grafana/grafana:8.2.7
     ports:
       - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      ELASTIC_INDEX: requests
+      ELASTIC_HOST: elastic
+      ELASTIC_PORT: 9200
+      ELASTIC_USER: elastic
+      ELASTIC_PASSWORD: elastic
+    volumes:
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: monitoring
+    ports:
+      - "5432:5432"
+

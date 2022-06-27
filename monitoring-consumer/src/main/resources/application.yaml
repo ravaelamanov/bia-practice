@@ -8,9 +8,41 @@ spring:
   cloud:
     stream:
       function:
-        bindings:
-          requestConsumer-in-0: monitoring.requests
+        definition: requestConsumer;jwtUserCreatedUpdatedConsumer;synapseUserCreatedUpdatedConsumer
+      bindings:
+        requestConsumer-in-0:
+          destination: requests
+          group: monitoring
+        jwtUserCreatedUpdatedConsumer-in-0:
+          destination: crud.user.create,crud.user.update
+          group: monitoring
+        synapseUserCreatedUpdatedConsumer-in-0:
+          destination: synapse.crud.user.create,synapse.crud.user.update
+          group: monitoring
   elasticsearch:
     uris: ${ELASTIC_URIS:localhost:9200}
     username: ${ELASTIC_USERNAME:elastic}
     password: ${ELASTIC_PASSWORD:elastic}
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USER:admin}
+    password: ${DB_PASSWORD:admin}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:monitoring}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+elasticsearch:
+  index-name: ${ELASTIC_INDEX_NAME:requests}
+
+---
+
+#spring:
+#  config:
+#    activate:
+#      on-profile: dev
+#  jpa:
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true

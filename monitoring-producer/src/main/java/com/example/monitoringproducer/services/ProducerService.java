@@ -20,7 +20,7 @@ public class ProducerService {
 
     @SneakyThrows
     public void publish(Request request) {
-        processor.monitoringRequests()
+        processor.requests()
                 .send(MessageBuilder.withPayload(request).build()); // TODO: set timeouts
     }
 

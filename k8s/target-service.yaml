@@ -1,0 +1,73 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      mirror /mirror;
+      mirror_request_body off;
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location = /mirror {
+          set $target_service "target-service";
+          set $auth_type "/unknown";
+      
+          proxy_set_header x-target-service $target_service;
+          
+          internal;
+          log_subrequest on;
+          proxy_pass http://monitoring-producer-service.default.svc.cluster.local:8080$auth_type$request_uri;
+          proxy_connect_timeout 200ms;
+          proxy_read_timeout 200ms;
+      }
+  name: mirroring-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: target-service
+                port:
+                  name: target-svc-port
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: target-service
+  labels:
+    app: target-service
+spec:
+  ports:
+    - port: 8080
+      name: target-svc-port
+      targetPort: target-port
+  selector:
+    app: target
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: target
+  labels:
+    app: target
+spec:
+  selector:
+    matchLabels:
+      app: target
+  template:
+    metadata:
+      labels:
+        app: target
+    spec:
+      containers:
+        - name: target
+          image: target-service:0.0.1-SNAPSHOT
+          imagePullPolicy: Never
+          ports:
+            - name: target-port
+              containerPort: 8080

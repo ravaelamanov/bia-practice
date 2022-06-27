@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1655986215701-1
+      author: ravaelamanov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: synapse_id
+            constraintName: uc_users_synapse
+            tableName: users
+
